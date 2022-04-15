@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  redis:
+    container_name: blazeredis
+    image: "redis:6.0-alpine"
+    restart: always
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
+    # command: redis-server --requirepass sOmE_sEcUrE_pAsS
+    ports:
+      - "6380:6379"
+    volumes:
+      - cache:/data
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    # networks:
+    #   node_net:
+    #     ipv4_address: 172.28.1.4
+
+  web:
+    build: . #look for Dockerfile in current directory local machine
+    depends_on:
+      - redis
+    # deploy:
+    #   restart_policy:
+    #     condition: on-failure
+    ports:
+      - 6000:6000 #container port: local server port
+    volumes:
+      - ./:/usr/src/app #changes storing as cache /usr/src/app
+      - /use/src/app/mode_modules #separating node modules of container and local machine
+    command: npm run dev
+    # environment:
+    #   REDIS_HOST: redis
+    #   REDIS_PORT: 6379
+    # REDIS_PASSWORD: sOmE_sEcUrE_pAsS
+    # networks:
+    #   - webnet
+    environment:
+      # DATABASE_URL: postgres://postgres@postgres/webapp_dev
+      #type://username@host/db_name
+      PORT: 6000
+
+volumes:
+  cache:
+    driver: local
+# networks:
+#   node_net:
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet: 172.28.0.0/16
