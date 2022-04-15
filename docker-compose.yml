@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   redis:
-    container_name: blazeredis
+    container_name: blazeredis2
     image: "redis:6.0-alpine"
     restart: always
     command: ["redis-server", "--bind", "redis", "--port", "6379"]
